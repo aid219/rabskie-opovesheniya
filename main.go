@@ -1,35 +1,52 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/joho/godotenv"
-	twilio "github.com/twilio/twilio-go"
-	openapi "github.com/twilio/twilio-go/rest/api/v2010"
+	"log"
+	"rabiKrabi/internal/mailing/mail"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		fmt.Println("Error loading .env file:", err)
-		return
-	}
-
-	client := twilio.NewRestClient()
-	// twilio.Client()
-	params := &openapi.CreateMessageParams{}
-	params.SetTo(os.Getenv("TO_PHONE_NUMBER"))
-	params.SetFrom(os.Getenv("TWILIO_PHONE_NUMBER"))
-	params.SetPathAccountSid(os.Getenv("TWILIO_ACCOUNT_SID"))
-	params.SetBody("Hello from Golang!")
-
-	_, err := client.Api.CreateMessage(params)
+	err, agent := mail.InitMailAgent()
 	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		fmt.Println("SMS sent successfully!")
+		log.Fatal(err)
+	}
+	err = mail.SendMail(agent, "aid219@mail.ru", "hello pidor")
+
+	if err != nil {
+		log.Fatal(err)
 	}
 }
+
+// import (
+// 	"fmt"
+// 	"os"
+
+// 	"github.com/joho/godotenv"
+// 	twilio "github.com/twilio/twilio-go"
+// 	openapi "github.com/twilio/twilio-go/rest/api/v2010"
+// )
+
+// func main() {
+// 	if err := godotenv.Load(); err != nil {
+// 		fmt.Println("Error loading .env file:", err)
+// 		return
+// 	}
+
+// 	client := twilio.NewRestClient()
+// 	// twilio.Client()
+// 	params := &openapi.CreateMessageParams{}
+// 	params.SetTo(os.Getenv("TO_PHONE_NUMBER"))
+// 	params.SetFrom(os.Getenv("TWILIO_PHONE_NUMBER"))
+// 	params.SetPathAccountSid(os.Getenv("TWILIO_ACCOUNT_SID"))
+// 	params.SetBody("Hello from Golang!")
+
+// 	_, err := client.Api.CreateMessage(params)
+// 	if err != nil {
+// 		fmt.Println(err.Error())
+// 	} else {
+// 		fmt.Println("SMS sent successfully!")
+// 	}
+// }
 
 // import (
 // 	"log"
