@@ -6,6 +6,7 @@ import (
 	"gopkg.in/mail.v2"
 )
 
+// ///sdasddasd
 func main() {
 	// Создаем новое сообщение
 	m := mail.NewMessage()
