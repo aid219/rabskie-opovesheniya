@@ -1,21 +1,35 @@
 package main
 
 import (
-	"log"
-	"rabiKrabi/internal/mailing/mail"
+	"rabiKrabi/internal/mailing/initial"
 )
 
+// 1150762777 tg
 func main() {
-	err, agent := mail.InitMailAgent()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = mail.SendMail(agent, "aid219@mail.ru", "hello pidor")
+	senders := initial.InitAllSenders()
+	senders[0].SetRecepient("659623386")
+	senders[0].SetRecepient("1150762777")
+	senders[1].SetRecepient("ahn.ngx@gmail.com")
+	senders[1].SetRecepient("aid219@mail.ru")
+	initial.SendAll(senders, "i wanna kiss your vu**")
+	// initial.SendAll(senders, "vse gorit")
 
-	if err != nil {
-		log.Fatal(err)
-	}
 }
+
+// err = mail.SendMail(agent, "aid219@mail.ru", "pisochka")
+
+// if err != nil {
+// 	log.Fatal(err)
+// }
+// err, agent := telega.InitTelegramAgent()
+// if err != nil {
+// 	log.Fatal(err)
+// }
+// var id int64 = 1150762777
+// err = telega.SendMail(agent, id, "nu ti i padla")
+// if err != nil {
+// 	log.Fatal(err)
+// }
 
 // import (
 // 	"fmt"
