@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -38,18 +39,15 @@ func (t *Mail) SetRecepient(rec string) error {
 }
 
 func (m *Mail) Send(mailContent string) error {
-	f := func(rec string) {
-		m.message.SetHeader("To", rec)
+	for _, i := range m.Recipients {
+		m.message.SetHeader("To", i)
 		m.message.SetBody("text/plain", mailContent)
-
 		err := m.dialer.DialAndSend(&m.message)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 			// return nil
 		}
-	}
-	for _, i := range m.Recipients {
-		f(i)
+		fmt.Println(mailContent)
 	}
 	return nil
 }

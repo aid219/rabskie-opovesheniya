@@ -1,17 +1,30 @@
 package main
 
 import (
+	"fmt"
+	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/initial"
+	"time"
 )
+
+func sss(senders []mailing.Messager) {
+	initial.SendAll(senders, "1")
+	initial.SendAll(senders, "2")
+	initial.SendAll(senders, "3")
+}
 
 // 1150762777 tg
 func main() {
 	senders := initial.InitAllSenders()
-	senders[0].SetRecepient("659623386")
-	senders[0].SetRecepient("1150762777")
-	senders[1].SetRecepient("ahn.ngx@gmail.com")
-	senders[1].SetRecepient("aid219@mail.ru")
-	initial.SendAll(senders, "i wanna kiss your vu**")
+	// senders[0].SetRecepient("659623386")
+	// senders[0].SetRecepient("1150762777")
+	senders[0].SetRecepient("aid219@mail.ru")
+	senders[0].SetRecepient("aid219@yandex.ru")
+	go sss(senders)
+	for {
+		fmt.Println("bup!")
+		time.Sleep(1 * time.Second)
+	}
 	// initial.SendAll(senders, "vse gorit")
 
 }
