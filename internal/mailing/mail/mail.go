@@ -11,9 +11,9 @@ import (
 )
 
 type Mail struct {
-	message    mail.Message
-	dialer     mail.Dialer
-	Recipients []string
+	message   mail.Message
+	dialer    mail.Dialer
+	Recipient string
 }
 
 func (m *Mail) Init() error {
@@ -34,20 +34,19 @@ func (m *Mail) Init() error {
 }
 
 func (t *Mail) SetRecepient(rec string) error {
-	t.Recipients = append(t.Recipients, rec)
+	t.Recipient = rec
 	return nil
 }
 
 func (m *Mail) Send(mailContent string) error {
-	for _, i := range m.Recipients {
-		m.message.SetHeader("To", i)
-		m.message.SetBody("text/plain", mailContent)
-		err := m.dialer.DialAndSend(&m.message)
-		if err != nil {
-			fmt.Println(err)
-			// return nil
-		}
-		fmt.Println(mailContent)
+	m.message.SetHeader("To", m.Recipient)
+	// m.message.SetBody("text/plain", mailContent)
+	m.message.SetBody("text/html", mailContent)
+	err := m.dialer.DialAndSend(&m.message)
+	if err != nil {
+		fmt.Println(err)
+		// return nil
 	}
+	// fmt.Println(mailContent)
 	return nil
 }

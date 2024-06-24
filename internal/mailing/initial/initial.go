@@ -13,10 +13,10 @@ func Init() []mailing.Messager {
 	for _, i := range mes {
 		switch i {
 		case "telegram":
-			var m mailing.Messager = &telega.Telega{}
+			var m mailing.Messager = &(telega.Telega{})
 			msgrs = append(msgrs, m)
-		case "mail":
-			var m mailing.Messager = &mail.Mail{}
+		case "email":
+			var m mailing.Messager = &(mail.Mail{})
 			msgrs = append(msgrs, m)
 		}
 	}
@@ -27,7 +27,7 @@ func setRec(mes []mailing.Messager, sender string, data string) {
 	switch sender {
 	case "telegram":
 		mes[0].SetRecepient(data)
-	case "mail":
+	case "email":
 		mes[0].SetRecepient(data)
 	}
 }

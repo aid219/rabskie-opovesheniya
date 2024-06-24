@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/initial"
-	"time"
+	"rabiKrabi/internal/rabbit"
 )
 
 func sss(senders []mailing.Messager) {
@@ -15,16 +15,20 @@ func sss(senders []mailing.Messager) {
 
 // 1150762777 tg
 func main() {
-	senders := initial.InitAllSenders()
-	// senders[0].SetRecepient("659623386")
-	// senders[0].SetRecepient("1150762777")
-	senders[0].SetRecepient("aid219@mail.ru")
-	senders[0].SetRecepient("aid219@yandex.ru")
-	go sss(senders)
-	for {
-		fmt.Println("bup!")
-		time.Sleep(1 * time.Second)
+	a, b, err := rabbit.Init("amqp://guest:guest@localhost:5672/", "rabbitsLoveAnal")
+	if err != nil {
+		log.Fatal(err)
 	}
+	aa, _ := rabbit.Receive(a, b)
+	send := initial.InitAllSenders()
+	rabbit.RabPars(aa, send)
+	// senders := initial.InitAllSenders()
+	// senders[0].SetRecepient("659623386")
+	// go sss(senders)
+	// senders[0].SetRecepient("1150762777")
+	// senders[0].SetRecepient("aid219@mail.ru")
+	// senders[0].SetRecepient("aid219@yandex.ru")
+
 	// initial.SendAll(senders, "vse gorit")
 
 }

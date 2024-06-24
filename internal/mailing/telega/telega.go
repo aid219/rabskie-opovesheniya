@@ -3,15 +3,14 @@ package telega
 import (
 	"log"
 	"os"
-	"strconv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 )
 
 type Telega struct {
-	bot        tgbotapi.BotAPI
-	Recipients []string
+	bot       *tgbotapi.BotAPI
+	Recipient string
 }
 
 func (t *Telega) Init() error {
@@ -21,7 +20,7 @@ func (t *Telega) Init() error {
 	}
 	botToken := os.Getenv("TG_TOKEN")
 	bot, err := tgbotapi.NewBotAPI(botToken)
-	t.bot = *bot
+	t.bot = bot
 	if err != nil {
 		log.Panic(err)
 	}
@@ -29,27 +28,21 @@ func (t *Telega) Init() error {
 }
 
 func (t *Telega) SetRecepient(rec string) error {
-	t.Recipients = append(t.Recipients, rec)
+	t.Recipient = rec
 	return nil
 }
 
 func (t *Telega) Send(mailContent string) error {
-	f := func(rec string) {
-		chatID, err := strconv.Atoi(rec)
-		if err != nil {
-			log.Panic(err)
-		}
-		msg := tgbotapi.NewMessage(int64(chatID), mailContent)
-
-		_, err = t.bot.Send(msg)
-		if err != nil {
-			log.Panic(err)
-		}
-	}
-	for _, i := range t.Recipients {
-		go f(i)
-	}
-
-	log.Println("Все отправлено!")
+	// sdfs := "324234234"
+	// chatID, err := strconv.Atoi(sdfs)
+	// if err != nil {
+	// 	log.Panic(err)
+	// }
+	// msg := tgbotapi.NewMessage(int64(chatID), mailContent)
+	// _, err = t.bot.Send(msg)
+	// if err != nil {
+	// 	log.Panic(err)
+	// }
+	// log.Println("Все отправлено!")
 	return nil
 }
