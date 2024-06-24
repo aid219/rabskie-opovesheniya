@@ -2,16 +2,9 @@ package main
 
 import (
 	"log"
-	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/initial"
 	"rabiKrabi/internal/rabbit"
 )
-
-func sss(senders []mailing.Messager) {
-	initial.SendAll(senders, "1")
-	initial.SendAll(senders, "2")
-	initial.SendAll(senders, "3")
-}
 
 // 1150762777 tg
 func main() {
@@ -19,9 +12,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	aa, _ := rabbit.Receive(a, b)
 	send := initial.InitAllSenders()
-	rabbit.RabPars(aa, send)
+	aa, _ := rabbit.Receive(a, b)
+	for {
+		in := <-aa
+		if len(in.To) > 0 {
+			go rabbit.Send(in, send)
+		}
+
+	}
 	// senders := initial.InitAllSenders()
 	// senders[0].SetRecepient("659623386")
 	// go sss(senders)

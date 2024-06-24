@@ -11,20 +11,18 @@ import (
 )
 
 type Mail struct {
-	message   mail.Message
-	dialer    mail.Dialer
-	Recipient string
+	message mail.Message
+	dialer  mail.Dialer
 }
 
 func (m *Mail) Init() error {
-	mailHeader := "Qummy notifications"
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 	m.message = *(mail.NewMessage())
 	m.message.SetHeader("From", os.Getenv("MAIL_SENDER"))
-	m.message.SetHeader("Subject", mailHeader)
+
 	port, _ := strconv.ParseInt(os.Getenv("MAIL_PORT"), 10, 64)
 	s := os.Getenv("MAIL_HOST")
 	_ = s
@@ -33,15 +31,10 @@ func (m *Mail) Init() error {
 	return nil
 }
 
-func (t *Mail) SetRecepient(rec string) error {
-	t.Recipient = rec
-	return nil
-}
-
-func (m *Mail) Send(mailContent string) error {
-	m.message.SetHeader("To", m.Recipient)
-	// m.message.SetBody("text/plain", mailContent)
-	m.message.SetBody("text/html", mailContent)
+func (m *Mail) Send(mailRecipient string, mailTopic string, mailContent string) error {
+	m.message.SetHeader("To", mailRecipient)
+	m.message.SetHeader("Subject", mailTopic)
+	m.message.SetBody("text/plain", mailContent)
 	err := m.dialer.DialAndSend(&m.message)
 	if err != nil {
 		fmt.Println(err)

@@ -1,6 +1,17 @@
 package rabbit
 
-// {"to":[{"type": "email", "recipient":"aid@219@mail.ru"}, {"type": "email", "recipient":"Aid@219@yandex.ru"}], "message":{"text":"sosinator33", "HTML":""}}
+// {
+// 	"to": [
+// 	  {"type": "email", "recipient": "aid219@mail.ru"},
+// 	  {"type": "email", "recipient": "Aid219@yandex.ru"}
+// 	],
+// 	"message": {
+// 	  "topic":"wuwu",
+// 	  "body": "hi bomzh",
+// 	  "HTML": ""
+// 	}
+//   }
+
 import (
 	"encoding/json"
 	"fmt"
@@ -37,7 +48,7 @@ func Init(host string, queueName string) (*amqp.Channel, *amqp.Queue, error) {
 	return ch, &q, nil
 }
 
-func Receive(ch *amqp.Channel, q *amqp.Queue) (chan string, error) {
+func Receive(ch *amqp.Channel, q *amqp.Queue) (chan InData, error) {
 	msgs, err := ch.Consume(
 		q.Name, // queue
 		"",     // consumer
@@ -50,7 +61,7 @@ func Receive(ch *amqp.Channel, q *amqp.Queue) (chan string, error) {
 	failOnError(err, "Failed to register a consumer")
 
 	// Бесконечно ждем сообщения в горутине
-	out := make(chan string)
+	out := make(chan InData)
 
 	// Горутина для получения сообщений
 	go func() {
@@ -58,16 +69,20 @@ func Receive(ch *amqp.Channel, q *amqp.Queue) (chan string, error) {
 		defer ch.Close()
 		for d := range msgs {
 			// log.Printf("Received a message: %s", d.Body)
-			out <- string(d.Body) // Отправляем содержимое сообщения через канал out
+			parsedData, err := RabPars(d.Body)
+			if err != nil {
+				log.Fatalf("Error parsing JSON: %v", err)
+			}
+			out <- parsedData // Отправляем содержимое сообщения через канал out
 		}
 	}()
-
 	return out, nil
 }
 
 type Message struct {
-	Text string `json:"text"`
-	HTML string `json:"html"`
+	Topic string `json:"topic"`
+	Body  string `json:"body"`
+	HTML  string `json:"html"`
 }
 
 type To struct {
@@ -80,51 +95,38 @@ type InData struct {
 	Message Message `json:"message"`
 }
 
-func RabPars(ch chan string, senders []mailing.Messager) ([]string, string, error) {
+func RabPars(income []byte) (InData, error) {
 	var inD InData
-	for {
-		bb := <-ch
-		// Парсинг JSON строки в структуру
-		err := json.Unmarshal([]byte(bb), &inD)
-		if len(inD.To) > 0 {
-			for _, i := range inD.To {
-				if i.Type == "email" {
-					senders[1].SetRecepient(i.Recipient)
-					senders[1].Send(inD.Message.Text)
-				} else if i.Type == "telegram" {
-					senders[0].SetRecepient(i.Recipient)
-					senders[0].Send(inD.Message.Text)
-				}
-
-			}
-		}
-		fmt.Println(len(inD.To))
-		if err != nil {
-			log.Fatalf("Error parsing JSON: %v", err)
-		}
-		// if inD.To.Type[0] == "mail" || inD.To.Type == "telegram" {
-
-		// }
-		fmt.Println(inD.Message.Text)
+	err := json.Unmarshal(income, &inD)
+	if err != nil {
+		log.Fatalf("Error parsing JSON: %v", err)
 	}
-
-	return nil, "", nil
+	return inD, nil
 }
 
-// func send(ch *amqp.Channel, queueName string, message string) {
+func Send(income InData, senders map[string]mailing.Messager) error {
 
-// 	body := message
+	mailling := income
+	if len(mailling.To) > 0 {
+		for _, i := range mailling.To {
+			switch i.Type {
 
-// 	err := ch.Publish(
-// 		"",        // exchange
-// 		queueName, // routing key
-// 		false,     // mandatory
-// 		false,     // immediate
-// 		amqp.Publishing{
-// 			ContentType: "text/plain",
-// 			Body:        []byte(body),
-// 		})
+			case "email":
+				if mailling.Message.HTML == "" {
+					fmt.Println(i.Recipient, mailling.Message.Topic, mailling.Message.Body)
+					senders[i.Type].Send(i.Recipient, mailling.Message.Topic, mailling.Message.Body)
+				} else {
+					fmt.Println(i.Recipient, mailling.Message.Topic, mailling.Message.HTML)
+					senders[i.Type].Send(i.Recipient, mailling.Message.Topic, mailling.Message.HTML)
+				}
 
-// 	failOnError(err, "Failed to publish a message")
-// 	log.Printf(" [x] Sent %s", body)
-// }
+			case "telegram":
+
+				senders[i.Type].Send(i.Recipient, mailling.Message.Topic, mailling.Message.Body)
+
+			}
+
+		}
+	}
+	return nil
+}

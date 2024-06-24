@@ -3,14 +3,14 @@ package telega
 import (
 	"log"
 	"os"
+	"strconv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 )
 
 type Telega struct {
-	bot       *tgbotapi.BotAPI
-	Recipient string
+	bot *tgbotapi.BotAPI
 }
 
 func (t *Telega) Init() error {
@@ -27,22 +27,18 @@ func (t *Telega) Init() error {
 	return nil
 }
 
-func (t *Telega) SetRecepient(rec string) error {
-	t.Recipient = rec
-	return nil
-}
+func (t *Telega) Send(mailRecipient string, mailTopic string, mailContent string) error {
 
-func (t *Telega) Send(mailContent string) error {
-	// sdfs := "324234234"
-	// chatID, err := strconv.Atoi(sdfs)
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-	// msg := tgbotapi.NewMessage(int64(chatID), mailContent)
-	// _, err = t.bot.Send(msg)
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-	// log.Println("Все отправлено!")
+	chatID, err := strconv.Atoi(mailRecipient)
+	if err != nil {
+		log.Panic(err)
+	}
+	fullMessage := mailTopic + "\n\n" + mailContent
+	msg := tgbotapi.NewMessage(int64(chatID), fullMessage)
+	_, err = t.bot.Send(msg)
+	if err != nil {
+		log.Panic(err)
+	}
+	log.Println("Все отправлено!")
 	return nil
 }
