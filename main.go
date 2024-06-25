@@ -11,7 +11,7 @@ import (
 
 var ConfigData config.Config
 
-// 1150762777 tg
+// yeboi
 func main() {
 	log, err := logger.SetupLogger()
 
