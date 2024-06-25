@@ -20,6 +20,6 @@ type Rabbit struct {
 type Config struct {
 	Messangers []string `yaml:"messangers"`
 	Telegram   Telegram `yaml:"telegram"`
-	Mail       Mail     `yaml:"mail"`
+	Mail       Mail     `yaml:"email"`
 	Rabbit     Rabbit   `yaml:"rabbit"`
 }

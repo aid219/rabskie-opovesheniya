@@ -2,7 +2,6 @@ package main
 
 import (
 	"rabiKrabi/config"
-	"rabiKrabi/globals"
 	"rabiKrabi/internal/logger"
 	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/initial"
@@ -11,7 +10,6 @@ import (
 
 var ConfigData config.Config
 
-// yeboi
 func main() {
 	log, err := logger.SetupLogger()
 
@@ -19,9 +17,9 @@ func main() {
 		log.Error("Error setup logger", err)
 	}
 
-	globals.ConfigData = config.LoadConfig(log)
+	config.ConfigData = config.LoadConfig(log)
 
-	ch, que, err := rabbit.Init(log, globals.ConfigData.Rabbit.Host, globals.ConfigData.Rabbit.Queue)
+	ch, que, err := rabbit.Init(log, config.ConfigData.Rabbit.Host, config.ConfigData.Rabbit.Queue)
 
 	if err != nil {
 		log.Error("Error init rabbit", err)

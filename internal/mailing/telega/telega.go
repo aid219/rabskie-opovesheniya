@@ -2,14 +2,14 @@ package telega
 
 import (
 	"log/slog"
-	"rabiKrabi/globals"
+	"rabiKrabi/config"
 	"strconv"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func (t *Telega) Init(log *slog.Logger) error {
-	botToken := globals.ConfigData.Telegram.Token
+	botToken := config.ConfigData.Telegram.Token
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	t.bot = bot
 	if err != nil {

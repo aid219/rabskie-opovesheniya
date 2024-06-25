@@ -2,7 +2,7 @@ package initial
 
 import (
 	"log/slog"
-	"rabiKrabi/globals"
+	"rabiKrabi/config"
 	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/mail"
 	"rabiKrabi/internal/mailing/telega"
@@ -10,7 +10,7 @@ import (
 
 func Init(log *slog.Logger) map[string]mailing.Messager {
 	msgrs := make(map[string]mailing.Messager)
-	mes := globals.ConfigData.Messangers
+	mes := config.ConfigData.Messangers
 	for _, i := range mes {
 		switch i {
 		case "telegram":
@@ -21,7 +21,7 @@ func Init(log *slog.Logger) map[string]mailing.Messager {
 			msgrs[i] = m
 		}
 	}
-	log.Info("Collected messangers: %v", msgrs)
+	log.Info("Collected messangers!")
 	return msgrs
 }
 
@@ -30,6 +30,6 @@ func InitAllSenders(log *slog.Logger) map[string]mailing.Messager {
 	for _, i := range messangers {
 		i.Init(log)
 	}
-	log.Info("All messangers init: %v", messangers)
+	log.Info("All messangers init!")
 	return messangers
 }

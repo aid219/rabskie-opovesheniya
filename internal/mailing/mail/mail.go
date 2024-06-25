@@ -2,7 +2,7 @@ package mail
 
 import (
 	"log/slog"
-	"rabiKrabi/globals"
+	"rabiKrabi/config"
 
 	"gopkg.in/mail.v2"
 )
@@ -10,8 +10,8 @@ import (
 func (m *Mail) Init(log *slog.Logger) error {
 
 	m.message = *(mail.NewMessage())
-	m.message.SetHeader("From", globals.ConfigData.Mail.Sender)
-	m.dialer = *(mail.NewDialer(globals.ConfigData.Mail.Host, int(globals.ConfigData.Mail.Port), globals.ConfigData.Mail.Username, globals.ConfigData.Mail.Password))
+	m.message.SetHeader("From", config.ConfigData.Mail.Sender)
+	m.dialer = *(mail.NewDialer(config.ConfigData.Mail.Host, int(config.ConfigData.Mail.Port), config.ConfigData.Mail.Username, config.ConfigData.Mail.Password))
 	m.dialer.StartTLSPolicy = mail.MandatoryStartTLS
 	log.Info("mail sender init successfully!")
 	return nil

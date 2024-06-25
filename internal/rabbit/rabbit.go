@@ -15,6 +15,7 @@ package rabbit
 import (
 	"encoding/json"
 	"log/slog"
+	"os"
 
 	"github.com/streadway/amqp"
 )
@@ -69,12 +70,18 @@ func Receive(log *slog.Logger, ch *amqp.Channel, q *amqp.Queue) (chan InData, er
 	// Горутина для получения сообщений
 
 	go func() {
+
 		defer close(out)
 		defer ch.Close()
 		for d := range msgs {
 			parsedData, err := Parsing(log, d.Body)
 			if err != nil {
 				log.Error("Error parsing JSON from rabbit: ", err)
+
+				file, _ := os.OpenFile("test.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+				file.WriteString(string(d.Body) + "\n")
+				file.Close()
+
 				continue
 			}
 			out <- parsedData // Отправляем содержимое сообщения через канал out
@@ -89,6 +96,7 @@ func Parsing(log *slog.Logger, income []byte) (InData, error) {
 	err := json.Unmarshal(income, &inD)
 	if err != nil {
 		log.Error("Error parsing JSON: ", err)
+		return inD, err
 	}
 	return inD, nil
 }

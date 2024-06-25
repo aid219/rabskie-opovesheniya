@@ -7,6 +7,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var ConfigData *Config = nil
+
 func LoadConfig(log *slog.Logger) *Config {
 	var conf Config
 	yamlFile, err := os.ReadFile("./local.yaml")
