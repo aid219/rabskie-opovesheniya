@@ -1,15 +1,16 @@
 package initial
 
 import (
-	"rabiKrabi/config"
+	"log/slog"
+	"rabiKrabi/globals"
 	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/mail"
 	"rabiKrabi/internal/mailing/telega"
 )
 
-func Init() map[string]mailing.Messager {
+func Init(log *slog.Logger) map[string]mailing.Messager {
 	msgrs := make(map[string]mailing.Messager)
-	mes := config.LoadConfig().Messangers
+	mes := globals.ConfigData.Messangers
 	for _, i := range mes {
 		switch i {
 		case "telegram":
@@ -20,13 +21,15 @@ func Init() map[string]mailing.Messager {
 			msgrs[i] = m
 		}
 	}
+	log.Info("Collected messangers: %v", msgrs)
 	return msgrs
 }
 
-func InitAllSenders() map[string]mailing.Messager {
-	messangers := Init()
+func InitAllSenders(log *slog.Logger) map[string]mailing.Messager {
+	messangers := Init(log)
 	for _, i := range messangers {
-		i.Init()
+		i.Init(log)
 	}
+	log.Info("All messangers init: %v", messangers)
 	return messangers
 }

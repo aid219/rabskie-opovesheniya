@@ -14,27 +14,23 @@ package rabbit
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
-	"rabiKrabi/internal/mailing"
+	"log/slog"
 
 	"github.com/streadway/amqp"
 )
 
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
-	}
-}
-
-func Init(host string, queueName string) (*amqp.Channel, *amqp.Queue, error) {
+func Init(log *slog.Logger, host string, queueName string) (*amqp.Channel, *amqp.Queue, error) {
 	conn, err := amqp.Dial(host)
-	failOnError(err, "Failed to connect to RabbitMQ")
-	// defer conn.Close()
-
+	if err != nil {
+		log.Error("Error dialing broker : ", err)
+		return nil, nil, err
+	}
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	// defer ch.Close()
+
+	if err != nil {
+		log.Error("Error creating channel : ", err)
+		return nil, nil, err
+	}
 
 	q, err := ch.QueueDeclare(
 		queueName, // name
@@ -44,11 +40,14 @@ func Init(host string, queueName string) (*amqp.Channel, *amqp.Queue, error) {
 		false,     // no-wait
 		nil,       // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Error("Error declaring queue : ", err)
+		return nil, nil, err
+	}
 	return ch, &q, nil
 }
 
-func Receive(ch *amqp.Channel, q *amqp.Queue) (chan InData, error) {
+func Receive(log *slog.Logger, ch *amqp.Channel, q *amqp.Queue) (chan InData, error) {
 	msgs, err := ch.Consume(
 		q.Name, // queue
 		"",     // consumer
@@ -58,75 +57,38 @@ func Receive(ch *amqp.Channel, q *amqp.Queue) (chan InData, error) {
 		false,  // no-wait
 		nil,    // args
 	)
-	failOnError(err, "Failed to register a consumer")
+
+	if err != nil {
+		log.Error("Error consuming queue : ", err)
+		return nil, err
+	}
 
 	// Бесконечно ждем сообщения в горутине
 	out := make(chan InData)
 
 	// Горутина для получения сообщений
+
 	go func() {
 		defer close(out)
 		defer ch.Close()
 		for d := range msgs {
-			// log.Printf("Received a message: %s", d.Body)
-			parsedData, err := RabPars(d.Body)
+			parsedData, err := Parsing(log, d.Body)
 			if err != nil {
-				log.Fatalf("Error parsing JSON: %v", err)
+				log.Error("Error parsing JSON from rabbit: ", err)
+				continue
 			}
 			out <- parsedData // Отправляем содержимое сообщения через канал out
 		}
 	}()
+
 	return out, nil
 }
 
-type Message struct {
-	Topic string `json:"topic"`
-	Body  string `json:"body"`
-	HTML  string `json:"html"`
-}
-
-type To struct {
-	Type      string `json:"type"`
-	Recipient string `json:"recipient"`
-}
-
-type InData struct {
-	To      []To    `json:"to"`
-	Message Message `json:"message"`
-}
-
-func RabPars(income []byte) (InData, error) {
+func Parsing(log *slog.Logger, income []byte) (InData, error) {
 	var inD InData
 	err := json.Unmarshal(income, &inD)
 	if err != nil {
-		log.Fatalf("Error parsing JSON: %v", err)
+		log.Error("Error parsing JSON: ", err)
 	}
 	return inD, nil
-}
-
-func Send(income InData, senders map[string]mailing.Messager) error {
-
-	mailling := income
-	if len(mailling.To) > 0 {
-		for _, i := range mailling.To {
-			switch i.Type {
-
-			case "email":
-				if mailling.Message.HTML == "" {
-					fmt.Println(i.Recipient, mailling.Message.Topic, mailling.Message.Body)
-					senders[i.Type].Send(i.Recipient, mailling.Message.Topic, mailling.Message.Body)
-				} else {
-					fmt.Println(i.Recipient, mailling.Message.Topic, mailling.Message.HTML)
-					senders[i.Type].Send(i.Recipient, mailling.Message.Topic, mailling.Message.HTML)
-				}
-
-			case "telegram":
-
-				senders[i.Type].Send(i.Recipient, mailling.Message.Topic, mailling.Message.Body)
-
-			}
-
-		}
-	}
-	return nil
 }
