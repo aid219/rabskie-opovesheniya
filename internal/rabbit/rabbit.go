@@ -15,7 +15,6 @@ package rabbit
 import (
 	"encoding/json"
 	"log/slog"
-	"os"
 
 	"github.com/streadway/amqp"
 )
@@ -78,12 +77,13 @@ func Receive(log *slog.Logger, ch *amqp.Channel, q *amqp.Queue) (chan InData, er
 			if err != nil {
 				log.Error("Error parsing JSON from rabbit: ", err)
 
-				file, _ := os.OpenFile("test.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-				file.WriteString(string(d.Body) + "\n")
-				file.Close()
+				// file, _ := os.OpenFile("test.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+				// file.WriteString(string(d.Body) + "\n")
+				// file.Close()
 
 				continue
 			}
+			d.Ack(true)
 			out <- parsedData // Отправляем содержимое сообщения через канал out
 		}
 	}()
