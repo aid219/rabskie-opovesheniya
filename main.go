@@ -3,7 +3,6 @@ package main
 import (
 	"rabiKrabi/config"
 	"rabiKrabi/internal/logger"
-	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/initial"
 	"rabiKrabi/internal/rabbit"
 )
@@ -27,13 +26,12 @@ func main() {
 
 	senders := initial.InitAllSenders(log)
 
-	incomeCh, _ := rabbit.Receive(log, ch, que)
+	err = rabbit.ReceiveAndSend(log, ch, que, senders)
+	if err != nil {
+		log.Error("Error receive and send operation", err)
+	}
 
 	for {
-		incomeData := <-incomeCh
-		if len(incomeData.To) > 0 {
-			go mailing.Send(log, incomeData, senders)
-		}
-
 	}
+
 }

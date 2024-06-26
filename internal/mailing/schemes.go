@@ -1,4 +1,4 @@
-package rabbit
+package mailing
 
 type Message struct {
 	Topic string `json:"topic"`

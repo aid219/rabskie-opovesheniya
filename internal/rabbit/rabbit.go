@@ -13,8 +13,9 @@ package rabbit
 //   }
 
 import (
-	"encoding/json"
 	"log/slog"
+	"os"
+	"rabiKrabi/internal/mailing"
 
 	"github.com/streadway/amqp"
 )
@@ -47,7 +48,7 @@ func Init(log *slog.Logger, host string, queueName string) (*amqp.Channel, *amqp
 	return ch, &q, nil
 }
 
-func Receive(log *slog.Logger, ch *amqp.Channel, q *amqp.Queue) (chan InData, error) {
+func ReceiveAndSend(log *slog.Logger, ch *amqp.Channel, q *amqp.Queue, senders map[string]mailing.Messager) error {
 	msgs, err := ch.Consume(
 		q.Name, // queue
 		"",     // consumer
@@ -60,43 +61,39 @@ func Receive(log *slog.Logger, ch *amqp.Channel, q *amqp.Queue) (chan InData, er
 
 	if err != nil {
 		log.Error("Error consuming queue : ", err)
-		return nil, err
+		return err
 	}
 
+	err = ch.Qos(
+		100,   // prefetchCount: количество сообщений, которые может получить потребитель за один раз
+		0,     // prefetchSize
+		false, // global
+	)
+
 	// Бесконечно ждем сообщения в горутине
-	out := make(chan InData)
+	out := make(chan *amqp.Delivery)
 
 	// Горутина для получения сообщений
 
 	go func() {
-
 		defer close(out)
 		defer ch.Close()
 		for d := range msgs {
-			parsedData, err := Parsing(log, d.Body)
+			err := mailing.Send(log, d.Body, senders)
 			if err != nil {
-				log.Error("Error parsing JSON from rabbit: ", err)
+				// d.Reject(false)
 
-				// file, _ := os.OpenFile("test.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-				// file.WriteString(string(d.Body) + "\n")
-				// file.Close()
+				file, _ := os.OpenFile("test.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+				file.WriteString(string(d.Body) + "\n")
+				file.Close()
 
+				// log.Error("Error send message : ", err)
+				// log.Error(string(d.Body))
 				continue
 			}
-			d.Ack(true)
-			out <- parsedData // Отправляем содержимое сообщения через канал out
+			// d.Ack(false)
 		}
 	}()
 
-	return out, nil
-}
-
-func Parsing(log *slog.Logger, income []byte) (InData, error) {
-	var inD InData
-	err := json.Unmarshal(income, &inD)
-	if err != nil {
-		log.Error("Error parsing JSON: ", err)
-		return inD, err
-	}
-	return inD, nil
+	return nil
 }
