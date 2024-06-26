@@ -27,13 +27,9 @@ func main() {
 
 	senders := initial.InitAllSenders(log)
 
-	incomeCh, _ := rabbit.Receive(log, ch, que)
-
-	for {
-		incomeData := <-incomeCh
-		if len(incomeData.To) > 0 {
-			go mailing.Send(log, incomeData, senders)
-		}
-
+	err = mailing.Receive(log, ch, que, senders)
+	if err != nil {
+		log.Error("Error receive", err)
 	}
+	select {}
 }

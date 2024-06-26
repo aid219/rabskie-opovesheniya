@@ -1,0 +1,21 @@
+radfASDF
+{
+	"to": [
+	  {"type": "telegram", "recipient": "1150762777"},
+	  {"type": "telegram", "recipient": "1150762777"},
+          {"type": "telegram", "recipient": "1150762777"},
+	],
+	"message": {
+	  "topic":"wuwu",
+	  "body": "hi bomzh",
+	  "HTML": ""
+	}
+  }
+dfadfasdfasd
+756
+756
+756
+756
+756
+756
+756
