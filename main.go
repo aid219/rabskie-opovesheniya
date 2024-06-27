@@ -6,11 +6,13 @@ import (
 	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/initial"
 	"rabiKrabi/internal/rabbit"
+	"time"
 )
 
 var ConfigData config.Config
 
 func main() {
+	time.Sleep(time.Second * 10)
 	log, err := logger.SetupLogger()
 
 	if err != nil {

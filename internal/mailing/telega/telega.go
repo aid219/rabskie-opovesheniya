@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"rabiKrabi/config"
 	"strconv"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -20,8 +21,8 @@ func (t *Telega) Init(log *slog.Logger) error {
 	return nil
 }
 
-func (t *Telega) Send(log *slog.Logger, mailRecipient string, mailTopic string, mailContent string) error {
-
+func (t *Telega) Send(log *slog.Logger, mailRecipient string, mailTopic string, mailContent string, timeOut uint16) error {
+	time.Sleep(time.Millisecond * time.Duration(timeOut))
 	chatID, err := strconv.Atoi(mailRecipient)
 	if err != nil {
 		log.Error("Error convert chatID", err)

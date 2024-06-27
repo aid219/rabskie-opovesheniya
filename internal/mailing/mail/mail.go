@@ -3,6 +3,7 @@ package mail
 import (
 	"log/slog"
 	"rabiKrabi/config"
+	"time"
 
 	"gopkg.in/mail.v2"
 )
@@ -17,7 +18,8 @@ func (m *Mail) Init(log *slog.Logger) error {
 	return nil
 }
 
-func (m *Mail) Send(log *slog.Logger, mailRecipient string, mailTopic string, mailContent string) error {
+func (m *Mail) Send(log *slog.Logger, mailRecipient string, mailTopic string, mailContent string, timeOut uint16) error {
+	time.Sleep(time.Millisecond * time.Duration(timeOut))
 	m.message.SetHeader("To", mailRecipient)
 	m.message.SetHeader("Subject", mailTopic)
 	m.message.SetBody("text/plain", mailContent)

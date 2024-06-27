@@ -12,6 +12,22 @@ package rabbit
 // 	}
 //   }
 
+// {
+// 	"to": [
+// 	  {"type": "telegram", "recipient": "1150762777"},
+// 	  {"type": "telegram", "recipient": "1150762777"},
+// 	  {"type": "telegram", "recipient": "1150762777"},
+// 	  {"type": "telegram", "recipient": "1150762777"},
+// 	  {"type": "telegram", "recipient": "1150762777"},
+// 	  {"type": "telegram", "recipient": "1150762777"}
+// 	],
+// 	"message": {
+// 	  "topic":"labuda",
+// 	  "body": "sosi i kosi!",
+// 	  "HTML": ""
+// 	}
+//   }
+
 import (
 	"log/slog"
 
