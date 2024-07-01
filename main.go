@@ -20,7 +20,7 @@ func main() {
 		log.Error("Error setup logger, critical stop", err)
 		os.Exit(1)
 	}
-	config.ConfigData, err = config.LoadConfig(log, "local.yaml.encrypted", []byte("1234567890123456"))
+	config.ConfigData, err = config.LoadConfig(log)
 
 	if err != nil {
 		log.Error("Error load config", err)

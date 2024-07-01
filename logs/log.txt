@@ -1,1 +1,6 @@
-time=2024-07-01T17:36:11.166+03:00 level=ERROR msg="Error load config" !BADKEY="ciphertext is not a multiple of the block size"
+time=2024-07-01T19:54:28.014+03:00 level=INFO msg="Collected messangers!"
+time=2024-07-01T19:54:28.488+03:00 level=INFO msg="telegram sender init successfully!"
+time=2024-07-01T19:54:28.488+03:00 level=INFO msg="mail sender init successfully!"
+time=2024-07-01T19:54:28.488+03:00 level=INFO msg="All messangers init!"
+time=2024-07-01T19:54:57.583+03:00 level=ERROR msg="Error parsing JSON: " !BADKEY="invalid character 'd' looking for beginning of value"
+time=2024-07-01T19:54:57.584+03:00 level=ERROR msg="Error parsing JSON from rabbit: " !BADKEY="invalid character 'd' looking for beginning of value"
