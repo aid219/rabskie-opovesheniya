@@ -71,7 +71,6 @@ func Parsing(log *slog.Logger, income []byte) (InData, error) {
 	err := json.Unmarshal(income, &inD)
 	if err != nil {
 		log.Error("Error parsing JSON: ", err)
-<<<<<<< HEAD
 		return inD, err
 	}
 	return inD, nil
@@ -79,26 +78,8 @@ func Parsing(log *slog.Logger, income []byte) (InData, error) {
 func Send(log *slog.Logger, income InData, senders map[string]Messager) error {
 	if len(income.To) > 0 {
 		for _, i := range income.To {
-=======
-		return nil, err
-	}
-	return &inD, nil
-}
-
-func Send(log *slog.Logger, income []byte, senders map[string]Messager) error {
-
-	parsedData, err := Parsing(log, income)
-
-	if err != nil {
-		log.Error("Error parsing JSON in send: ", err)
-		return err
-	}
-	if len(parsedData.To) > 0 {
-		for _, i := range parsedData.To {
->>>>>>> cea01185959211a08d2d37f32549ff211824e439
 			switch i.Type {
 			case "email":
-<<<<<<< HEAD
 				if income.Message.HTML == "" {
 					log.Info("Send email" + "/" + i.Recipient + "/" + income.Message.Topic + "/" + income.Message.Body)
 					senders[i.Type].Send(log, i.Recipient, income.Message.Topic, income.Message.Body, 500)
@@ -111,29 +92,6 @@ func Send(log *slog.Logger, income []byte, senders map[string]Messager) error {
 				log.Info("Send telegram" + "/" + i.Recipient + "/" + income.Message.Topic + "/" + income.Message.Body)
 
 				senders[i.Type].Send(log, i.Recipient, income.Message.Topic, income.Message.Body, 500)
-=======
-				if parsedData.Message.HTML == "" {
-					log.Info("Send email" + "/" + i.Recipient + "/" + parsedData.Message.Topic + "/" + parsedData.Message.Body)
-					err := senders[i.Type].Send(log, i.Recipient, parsedData.Message.Topic, parsedData.Message.Body)
-					if err != nil {
-						return err
-					}
-
-				} else {
-					log.Info("Send email" + "/" + i.Recipient + "/" + parsedData.Message.Topic + "/" + parsedData.Message.HTML)
-					err := senders[i.Type].Send(log, i.Recipient, parsedData.Message.Topic, parsedData.Message.HTML)
-					if err != nil {
-						return err
-					}
-				}
-
-			case "telegram":
-				log.Info("Send telegram" + "/" + i.Recipient + "/" + parsedData.Message.Topic + "/" + parsedData.Message.Body)
-				err := senders[i.Type].Send(log, i.Recipient, parsedData.Message.Topic, parsedData.Message.Body)
-				if err != nil {
-					return err
-				}
->>>>>>> cea01185959211a08d2d37f32549ff211824e439
 
 			}
 
