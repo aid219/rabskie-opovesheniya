@@ -5,6 +5,7 @@ import (
 	"os/signal"
 	"rabiKrabi/config"
 	"rabiKrabi/internal/logger"
+	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/initial"
 	"rabiKrabi/internal/rabbit"
 	"syscall"
@@ -19,7 +20,7 @@ func main() {
 		log.Error("Error setup logger, critical stop", err)
 		os.Exit(1)
 	}
-	config.ConfigData, err = config.LoadConfig(log, "local2.txt", []byte("qummy1234567890"))
+	config.ConfigData, err = config.LoadConfig(log, "local.yaml.encrypted", []byte("1234567890123456"))
 
 	if err != nil {
 		log.Error("Error load config", err)
@@ -38,7 +39,6 @@ func main() {
 		log.Error("Error init senders, critical stop", err)
 		os.Exit(1)
 	}
-
 	err = mailing.Receive(log, ch, que, senders)
 	if err != nil {
 		log.Error("Error receive", err)

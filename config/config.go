@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log/slog"
 
@@ -23,31 +24,35 @@ func decryptFile(filename string, key []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return nil, err
+	// Проверяем, что длина ciphertext кратна размеру блока AES
+	if len(ciphertext)%aes.BlockSize != 0 {
+		return nil, errors.New("ciphertext is not a multiple of the block size")
 	}
 
-	nonceSize := gcm.NonceSize()
-	if len(ciphertext) < nonceSize {
-		return nil, errors.New("ciphertext too short")
-	}
+	// Расшифровываем данные
+	plaintext := make([]byte, len(ciphertext))
+	mode := cipher.NewCBCDecrypter(block, key[:aes.BlockSize])
+	mode.CryptBlocks(plaintext, ciphertext)
 
-	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
-	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		return nil, err
-	}
+	// Удаляем дополнительные байты (padding)
+	plaintext = PKCS5Unpad(plaintext)
 
 	return plaintext, nil
 }
 
-// LoadConfig loads and decrypts a YAML configuration file into a Config struct.
+// PKCS5Unpad удаляет дополнительные байты (padding) для CBC
+func PKCS5Unpad(data []byte) []byte {
+	length := len(data)
+	unpadding := int(data[length-1])
+	return data[:(length - unpadding)]
+}
+
+// LoadConfig загружает и расшифровывает файл конфигурации YAML в структуру Config.
 func LoadConfig(log *slog.Logger, encryptedFilename string, key []byte) (*Config, error) {
 	// Расшифровываем файл
 	decryptedData, err := decryptFile(encryptedFilename, key)
 	if err != nil {
-		log.Error("Error decrypting YAML file", err)
+		fmt.Println("Error decrypting YAML file:", err)
 		return nil, err
 	}
 
@@ -57,7 +62,7 @@ func LoadConfig(log *slog.Logger, encryptedFilename string, key []byte) (*Config
 	// Распаковываем YAML данные в структуру Config
 	err = yaml.Unmarshal(decryptedData, &conf)
 	if err != nil {
-		log.Error("Error unmarshalling YAML file", err)
+		fmt.Println("Error unmarshalling YAML file:", err)
 		return nil, err
 	}
 
