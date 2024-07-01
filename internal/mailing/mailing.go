@@ -8,22 +8,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type Message struct {
-	Topic string `json:"topic"`
-	Body  string `json:"body"`
-	HTML  string `json:"html"`
-}
-
-type To struct {
-	Type      string `json:"type"`
-	Recipient string `json:"recipient"`
-}
-
-type InData struct {
-	To      []To    `json:"to"`
-	Message Message `json:"message"`
-}
-
 func Receive(log *slog.Logger, ch *amqp.Channel, q *amqp.Queue, senders map[string]Messager) error {
 	msgs, err := ch.Consume(
 		q.Name, // queue
@@ -59,7 +43,7 @@ func Receive(log *slog.Logger, ch *amqp.Channel, q *amqp.Queue, senders map[stri
 			_ = parsedData
 			if err != nil {
 				log.Error("Error parsing JSON from rabbit: ", err)
-				file, _ := os.OpenFile("test.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+				file, _ := os.OpenFile("./logs/IncorrectRabbitData.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 				file.WriteString(string(d.Body) + "\n")
 				file.Close()
 				d.Reject(false)

@@ -1,6 +1,7 @@
 package initial
 
 import (
+	"errors"
 	"log/slog"
 	"rabiKrabi/config"
 	"rabiKrabi/internal/mailing"
@@ -8,7 +9,7 @@ import (
 	"rabiKrabi/internal/mailing/telega"
 )
 
-func Init(log *slog.Logger) map[string]mailing.Messager {
+func Init(log *slog.Logger) (map[string]mailing.Messager, error) {
 	msgrs := make(map[string]mailing.Messager)
 	mes := config.ConfigData.Messangers
 	for _, i := range mes {
@@ -21,15 +22,23 @@ func Init(log *slog.Logger) map[string]mailing.Messager {
 			msgrs[i] = m
 		}
 	}
+	if len(msgrs) == 0 {
+		log.Error("No messangers found!")
+		err := errors.New("no messangers found")
+		return nil, err
+	}
 	log.Info("Collected messangers!")
-	return msgrs
+	return msgrs, nil
 }
 
-func InitAllSenders(log *slog.Logger) map[string]mailing.Messager {
-	messangers := Init(log)
+func InitAllSenders(log *slog.Logger) (map[string]mailing.Messager, error) {
+	messangers, err := Init(log)
+	if err != nil {
+		return nil, err
+	}
 	for _, i := range messangers {
 		i.Init(log)
 	}
 	log.Info("All messangers init!")
-	return messangers
+	return messangers, nil
 }

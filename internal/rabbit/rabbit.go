@@ -1,33 +1,5 @@
 package rabbit
 
-// {
-// 	"to": [
-// 	  {"type": "email", "recipient": "aid219@mail.ru"},
-// 	  {"type": "email", "recipient": "Aid219@yandex.ru"}
-// 	],
-// 	"message": {
-// 	  "topic":"wuwu",
-// 	  "body": "hi bomzh",
-// 	  "HTML": ""
-// 	}
-//   }
-
-// {
-// 	"to": [
-// 	  {"type": "telegram", "recipient": "1150762777"},
-// 	  {"type": "telegram", "recipient": "1150762777"},
-// 	  {"type": "telegram", "recipient": "1150762777"},
-// 	  {"type": "telegram", "recipient": "1150762777"},
-// 	  {"type": "telegram", "recipient": "1150762777"},
-// 	  {"type": "telegram", "recipient": "1150762777"}
-// 	],
-// 	"message": {
-// 	  "topic":"labuda",
-// 	  "body": "sosi i kosi!",
-// 	  "HTML": ""
-// 	}
-//   }
-
 import (
 	"log/slog"
 
