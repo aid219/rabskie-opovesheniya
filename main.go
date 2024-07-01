@@ -5,7 +5,6 @@ import (
 	"os/signal"
 	"rabiKrabi/config"
 	"rabiKrabi/internal/logger"
-	"rabiKrabi/internal/mailing"
 	"rabiKrabi/internal/mailing/initial"
 	"rabiKrabi/internal/rabbit"
 	"syscall"
@@ -20,8 +19,11 @@ func main() {
 		log.Error("Error setup logger, critical stop", err)
 		os.Exit(1)
 	}
+	config.ConfigData, err = config.LoadConfig(log, "local2.txt", []byte("qummy1234567890"))
 
-	config.ConfigData = config.LoadConfig(log)
+	if err != nil {
+		log.Error("Error load config", err)
+	}
 
 	ch, que, err := rabbit.Init(log, config.ConfigData.Rabbit.Host, config.ConfigData.Rabbit.Queue)
 
