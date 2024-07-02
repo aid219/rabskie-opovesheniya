@@ -3,30 +3,32 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main  # Вы можете указать другую ветку, если нужно
+      - main
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest  # Образ для выполнения действий
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository  # Шаг для проверки кода
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx  # Настройка среды с Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Log in to GitHub Container Registry  # Логин в GitHub Container Registry
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image  # Сборка и публикация Docker образаd
+      - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ghcr.io/aid219/rabskieopovesheniya:latest  # Замените на свои данные
+          tags: ghcr.io/aid219/rabskieopovesheniya:latest
+          dockerfile: Dockerfile  # Путь к Dockerfile, если он находится в корне проекта
+           # Замените на свои данные
 
           
