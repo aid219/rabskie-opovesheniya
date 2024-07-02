@@ -27,4 +27,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ghcr.io/aid219/rabskieOpovesheniya:latest  # Замените на свои данные
+          tags: ghcr.io/aid219/rabskieopovesheniya:latest  # Замените на свои данные
+
+          
