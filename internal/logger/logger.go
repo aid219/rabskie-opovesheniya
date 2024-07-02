@@ -8,12 +8,13 @@ import (
 	"log/slog"
 )
 
-func SetupLogger() (*slog.Logger, error) { // Настройка логгера
+func SetupLogger() (*slog.Logger, error) {
+	// Настройка переменных для логгирования
 	var log *slog.Logger
 	logDir := "./logs"
 	logFile := filepath.Join(logDir, "log.txt")
 
-	// Проверка и создание директории, если она не существует
+	// Проверка существования директории логов, создание при необходимости
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		err := os.MkdirAll(logDir, 0755)
 		if err != nil {
@@ -22,7 +23,7 @@ func SetupLogger() (*slog.Logger, error) { // Настройка логгер�
 		}
 	}
 
-	// Открытие файла для логирования
+	// Открытие файла логов для записи
 	file, err := os.OpenFile(logFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		log.Error("Error open log file!")
@@ -32,9 +33,8 @@ func SetupLogger() (*slog.Logger, error) { // Настройка логгер�
 	// Настройка вывода в два потока: консоль и файл
 	mw := io.MultiWriter(os.Stdout, file)
 
-	// Создание логгера
+	// Создание нового экземпляра логгера
 	log = slog.New(slog.NewTextHandler(mw, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
 	return log, nil
-
 }

@@ -1,0 +1,9 @@
+
+services:
+  myapp:
+    image: ghcr.io/aid219/rabskie-opovesheniya:tag
+    container_name: myapp
+    volumes:
+      - ./local.yaml:/local.yaml  # Примонтируйте файл конфигурации, если требуется
+
+    restart: unless-stopped  # Опционально: перезапускать контейнер в случае ошибок или перезапуска Docker
