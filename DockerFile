@@ -5,7 +5,7 @@ FROM golang:latest AS builder
 WORKDIR /app
 
 # Клонируем репозиторий с GitHub
-RUN git clone https://github.com/aid219/rabskieOpovesheniya.git .
+RUN git clone https://github.com/aid219/rabskie-opovesheniya.git .
 
 # Установим зависимости
 RUN go mod tidy
