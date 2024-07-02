@@ -28,7 +28,7 @@ jobs:
         with:
           push: true
           tags: ghcr.io/aid219/rabskie-opovesheniya:latest
-          dockerfile: Dockerfile  # Путь к Dockerfile, если он находится в корне проекта
+          dockerfile: ./Dockerfile  # Путь к Dockerfile, если он находится в корне проекта
            # Замените на свои данные
 
           
